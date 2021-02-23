@@ -4,7 +4,7 @@ A Elixir wrapper around imagemin-cli
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+If [available in Hex](https://hexdocs.pm/imagemin_ex/0.1.0), the package can be installed
 by adding `imagemin_ex` to your list of dependencies in `mix.exs`:
 
 ```elixir
