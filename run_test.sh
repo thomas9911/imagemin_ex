@@ -1,4 +1,3 @@
-npm init -y
-npm install imagemin-cli
-
+mix imagemin.install
+echo "Running tests:"
 ./test/manual_test.sh

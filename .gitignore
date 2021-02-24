@@ -24,5 +24,4 @@ imagemin_ex-*.tar
 
 # JS specifc temporary files
 /node_modules
-package.json
 package-lock.json

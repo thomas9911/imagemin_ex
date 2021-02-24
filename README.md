@@ -15,11 +15,15 @@ def deps do
 end
 ```
 
-Also currently you need to manually install imagemin-cli.
-I installed it by creating a new npm package and install it there:
+You can install the imagemin-cli by running:
 
 ```sh
-npm init -y
+mix imagemin.install
+```
+
+Also you can install imagemin-cli manually by:
+
+```sh
 npm install imagemin-cli
 ```
 
