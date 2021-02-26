@@ -9,6 +9,7 @@ defmodule ImageminEx.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      preferred_cli_env: [ci_test: :test],
       deps: deps()
     ]
   end
@@ -37,8 +38,7 @@ defmodule ImageminEx.MixProject do
 
   defp aliases do
     [
-      # integration test written in bash
-      {:i_test, "cmd sh ./run_test.sh"}
+      {:ci_test, ["imagemin.install", "test"]}
     ]
   end
 end

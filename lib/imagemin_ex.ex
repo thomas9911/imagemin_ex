@@ -32,12 +32,14 @@ defmodule ImageminEx do
   You can specify the used plugins in the config.
   """
   def convert(src, dest, cfg \\ nil) do
-    cfg = fetch_config(cfg)
-    {program, args, opts} = Config.make_command(cfg)
+    {program, args, opts} =
+      cfg
+      |> fetch_config()
+      |> Config.make_command()
 
-    with {:ok, device} <- open_file(dest),
-         {:ok, _output} <- Command.run_write(program, args ++ [src] ++ opts, device) do
-      :ok
+    with {:ok, _} <- :file.read_file_info(src),
+         {:ok, device} <- open_file(dest) do
+      Command.run_write(program, args ++ [src] ++ opts, device)
     end
   end
 
