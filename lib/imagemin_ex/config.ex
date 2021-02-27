@@ -13,7 +13,7 @@ defmodule ImageminEx.Config do
     "svgo"
   ]
 
-  defstruct [:node_path, :imagemin_cli_path, plugins: @default_plugins]
+  defstruct [:node_path, :imagemin_cli_path, plugins: @default_plugins, extra_plugin_options: []]
 
   def default do
     %__MODULE__{
@@ -31,7 +31,15 @@ defmodule ImageminEx.Config do
     %{cfg | plugins: plugins ++ extra_plugins}
   end
 
-  @spec make_command(__MODULE__.t()) :: {binary, [binary]}
+  def append_plugin_options(
+        %__MODULE__{extra_plugin_options: extra_plugin_options} = cfg,
+        keyword
+      ) do
+    extra_plugin_options = keyword_merge(extra_plugin_options, keyword)
+    %{cfg | extra_plugin_options: extra_plugin_options}
+  end
+
+  @spec make_command(__MODULE__.t()) :: {binary, [binary], [binary]}
   def make_command(%__MODULE__{
         node_path: nil,
         imagemin_cli_path: imagemin_cli_path,
@@ -43,12 +51,56 @@ defmodule ImageminEx.Config do
   def make_command(%__MODULE__{
         node_path: node_path,
         imagemin_cli_path: imagemin_cli_path,
-        plugins: plugins
+        plugins: plugins,
+        extra_plugin_options: extra_plugin_options
       }) do
-    {node_path, [imagemin_cli_path], prefix_plugins(plugins)}
+    options = Enum.concat(prefix_plugins(plugins), format_plugin_options(extra_plugin_options))
+    {node_path, [imagemin_cli_path], options}
   end
 
-  defp prefix_plugins(plugins) do
+  defp prefix_plugins(plugins) when is_list(plugins) do
     Enum.map(plugins, fn plugin -> "--plugin=#{plugin}" end)
+  end
+
+  defp prefix_plugins(plugin) do
+    plugin
+    |> List.wrap()
+    |> prefix_plugins()
+  end
+
+  defp format_plugin_options(options) when is_list(options) do
+    options
+    |> expand_keyword()
+    |> Enum.map(&do_format_plugin_options/1)
+  end
+
+  defp expand_keyword(options) when is_list(options) do
+    Enum.flat_map(options, fn {k, v} ->
+      v
+      |> expand_keyword()
+      |> Enum.map(&[k, &1])
+    end)
+  end
+
+  defp expand_keyword(options) do
+    [options]
+  end
+
+  defp do_format_plugin_options(x) do
+    args = x |> List.flatten()
+    {last, args} = List.pop_at(args, -1)
+    "--plugin.#{Enum.join(args, ".")}=#{last}"
+  end
+
+  def keyword_merge(original, override) do
+    Keyword.merge(original, override, &do_keyword_merge/3)
+  end
+
+  defp do_keyword_merge(_, left, right) when is_list(left) and is_list(right) do
+    keyword_merge(left, right)
+  end
+
+  defp do_keyword_merge(_, _left, right) do
+    right
   end
 end

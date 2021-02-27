@@ -4,7 +4,7 @@ defmodule ImageminExTest do
 
   alias ImageminEx.Config
 
-  @image_path Path.join(__DIR__, "imagemin_ex_test")
+  @image_path Path.join(__DIR__, "support/images")
 
   setup_all do
     tmp_folder = Path.join(System.tmp_dir!(), "#{__MODULE__}")
